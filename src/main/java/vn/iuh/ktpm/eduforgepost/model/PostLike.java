@@ -28,7 +28,7 @@ public class PostLike {
     private String postId;  // Reference to the Post
     
     @Indexed
-    private UUID userId;  // Reference to the user in the user service
+    private String userId;  // Reference to the user in the user service
     
     @CreatedDate
     private LocalDateTime likedAt;

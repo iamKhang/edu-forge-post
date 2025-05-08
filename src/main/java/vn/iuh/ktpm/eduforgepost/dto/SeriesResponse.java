@@ -17,7 +17,7 @@ import java.util.UUID;
 public class SeriesResponse {
     
     private String id;
-    private UUID userId;
+    private String userId;
     private String title;
     private String description;
     private String coverImage;

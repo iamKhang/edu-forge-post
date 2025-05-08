@@ -34,7 +34,7 @@ public class PostLikeController {
     }
     
     @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse<List<PostLike>>> getLikesByUserId(@PathVariable UUID userId) {
+    public ResponseEntity<ApiResponse<List<PostLike>>> getLikesByUserId(@PathVariable String userId) {
         List<PostLike> likes = postLikeService.getLikesByUserId(userId);
         return ResponseEntity.ok(ApiResponse.success(likes));
     }
@@ -42,7 +42,7 @@ public class PostLikeController {
     @GetMapping("/check")
     public ResponseEntity<ApiResponse<Boolean>> checkIfUserLikedPost(
             @RequestParam String postId,
-            @RequestParam UUID userId) {
+            @RequestParam String userId) {
         
         boolean isLiked = postLikeService.checkIfUserLikedPost(postId, userId);
         return ResponseEntity.ok(ApiResponse.success(isLiked));

@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class PostRequest {
 
     @NotNull(message = "User ID is required")
-    private UUID userId;
+    private String userId;
 
     @NotBlank(message = "Title is required")
     private String title;

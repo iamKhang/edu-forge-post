@@ -24,7 +24,7 @@ public class PostLikeService {
     @Transactional
     public boolean toggleLike(PostLikeRequest request) {
         String postId = request.getPostId();
-        UUID userId = request.getUserId();
+        String userId = request.getUserId();
         
         // Check if post exists
         Post post = postRepository.findById(postId)
@@ -69,11 +69,11 @@ public class PostLikeService {
         return postLikeRepository.findByPostId(postId);
     }
     
-    public List<PostLike> getLikesByUserId(UUID userId) {
+    public List<PostLike> getLikesByUserId(String userId) {
         return postLikeRepository.findByUserId(userId);
     }
     
-    public boolean checkIfUserLikedPost(String postId, UUID userId) {
+    public boolean checkIfUserLikedPost(String postId, String userId) {
         return postLikeRepository.existsByPostIdAndUserId(postId, userId);
     }
 }

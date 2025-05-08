@@ -39,10 +39,10 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir,
-            @RequestParam(required = false) UUID currentUserId) {
+            @RequestParam(required = false) String currentUserId) {
 
         // If currentUserId is not provided, use a default UUID to avoid null issues
-        UUID userIdToUse = (currentUserId != null) ? currentUserId : UUID.fromString("00000000-0000-0000-0000-000000000000");
+        String userIdToUse = (currentUserId != null) ? currentUserId : "00000000-0000-0000-0000-000000000000";
 
         Sort sort = sortDir.equalsIgnoreCase("asc") ?
                 Sort.by(sortBy).ascending() :
@@ -60,10 +60,10 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir,
-            @RequestParam(required = false) UUID currentUserId) {
+            @RequestParam(required = false) String currentUserId) {
 
         // If currentUserId is not provided, use a default UUID to avoid null issues
-        UUID userIdToUse = (currentUserId != null) ? currentUserId : UUID.fromString("00000000-0000-0000-0000-000000000000");
+        String userIdToUse = (currentUserId != null) ? currentUserId : "00000000-0000-0000-0000-000000000000";
 
         Sort sort = sortDir.equalsIgnoreCase("asc") ?
                 Sort.by(sortBy).ascending() :
@@ -77,15 +77,15 @@ public class PostController {
 
     @GetMapping("/user/{userId}/no-series")
     public ResponseEntity<ApiResponse<Page<PostResponse>>> getUserPostsWithoutSeries(
-            @PathVariable UUID userId,
+            @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir,
-            @RequestParam(required = false) UUID currentUserId) {
+            @RequestParam(required = false) String currentUserId) {
 
         // If currentUserId is not provided, use a default UUID to avoid null issues
-        UUID userIdToUse = (currentUserId != null) ? currentUserId : UUID.fromString("00000000-0000-0000-0000-000000000000");
+        String userIdToUse = (currentUserId != null) ? currentUserId : "00000000-0000-0000-0000-000000000000";
 
         Sort sort = sortDir.equalsIgnoreCase("asc") ?
                 Sort.by(sortBy).ascending() :
@@ -108,10 +108,10 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PostResponse>> getPostById(
             @PathVariable String id,
-            @RequestParam(required = false) UUID currentUserId) {
+            @RequestParam(required = false) String currentUserId) {
 
         // If currentUserId is not provided, use a default UUID to avoid null issues
-        UUID userIdToUse = (currentUserId != null) ? currentUserId : UUID.fromString("00000000-0000-0000-0000-000000000000");
+        String userIdToUse = (currentUserId != null) ? currentUserId : "00000000-0000-0000-0000-000000000000";
 
         PostResponse post = postService.getPostById(id, userIdToUse);
         return ResponseEntity.ok(ApiResponse.success(post));
@@ -123,10 +123,10 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir,
-            @RequestParam(required = false) UUID currentUserId) {
+            @RequestParam(required = false) String currentUserId) {
 
         // If currentUserId is not provided, use a default UUID to avoid null issues
-        UUID userIdToUse = (currentUserId != null) ? currentUserId : UUID.fromString("00000000-0000-0000-0000-000000000000");
+        String userIdToUse = (currentUserId != null) ? currentUserId : "00000000-0000-0000-0000-000000000000";
 
         Sort sort = sortDir.equalsIgnoreCase("asc") ?
                 Sort.by(sortBy).ascending() :
@@ -140,15 +140,15 @@ public class PostController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<Page<PostResponse>>> getPostsByUserId(
-            @PathVariable UUID userId,
+            @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir,
-            @RequestParam(required = false) UUID currentUserId) {
+            @RequestParam(required = false) String currentUserId) {
 
         // If currentUserId is not provided, use a default UUID to avoid null issues
-        UUID userIdToUse = (currentUserId != null) ? currentUserId : UUID.fromString("00000000-0000-0000-0000-000000000000");
+        String userIdToUse = (currentUserId != null) ? currentUserId : "00000000-0000-0000-0000-000000000000";
 
         Sort sort = sortDir.equalsIgnoreCase("asc") ?
                 Sort.by(sortBy).ascending() :
@@ -165,10 +165,10 @@ public class PostController {
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) UUID currentUserId) {
+            @RequestParam(required = false) String currentUserId) {
 
         // If currentUserId is not provided, use a default UUID to avoid null issues
-        UUID userIdToUse = (currentUserId != null) ? currentUserId : UUID.fromString("00000000-0000-0000-0000-000000000000");
+        String userIdToUse = (currentUserId != null) ? currentUserId : "00000000-0000-0000-0000-000000000000";
 
         Pageable pageable = PageRequest.of(page, size);
         Page<PostResponse> posts = postService.searchPosts(keyword, pageable, userIdToUse);
@@ -181,10 +181,10 @@ public class PostController {
             @PathVariable String tag,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) UUID currentUserId) {
+            @RequestParam(required = false) String currentUserId) {
 
         // If currentUserId is not provided, use a default UUID to avoid null issues
-        UUID userIdToUse = (currentUserId != null) ? currentUserId : UUID.fromString("00000000-0000-0000-0000-000000000000");
+        String userIdToUse = (currentUserId != null) ? currentUserId : "00000000-0000-0000-0000-000000000000";
 
         Pageable pageable = PageRequest.of(page, size);
         Page<PostResponse> posts = postService.getPostsByTag(tag, pageable, userIdToUse);
@@ -204,7 +204,7 @@ public class PostController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deletePost(
             @PathVariable String id,
-            @RequestParam UUID userId) {
+            @RequestParam String userId) {
 
         postService.deletePost(id, userId);
         return ResponseEntity.ok(ApiResponse.success("Post deleted successfully", null));

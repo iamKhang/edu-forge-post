@@ -15,9 +15,9 @@ public interface PostRepository extends MongoRepository<Post, String> {
 
     Page<Post> findByIsPublishedTrue(Pageable pageable);
 
-    Page<Post> findByUserId(UUID userId, Pageable pageable);
+    Page<Post> findByUserId(String userId, Pageable pageable);
 
-    List<Post> findByUserIdAndIsPublishedTrue(UUID userId);
+    List<Post> findByUserIdAndIsPublishedTrue(String userId);
 
     Page<Post> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(
             String titleKeyword, String contentKeyword, Pageable pageable);
@@ -35,5 +35,5 @@ public interface PostRepository extends MongoRepository<Post, String> {
     Page<Post> findBySeriesIdIsNull(Pageable pageable);
 
     // Find posts that are not part of any series for a specific user
-    Page<Post> findByUserIdAndSeriesIdIsNull(UUID userId, Pageable pageable);
+    Page<Post> findByUserIdAndSeriesIdIsNull(String userId, Pageable pageable);
 }

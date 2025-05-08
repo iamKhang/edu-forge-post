@@ -19,5 +19,5 @@ public class PostLikeRequest {
     private String postId;
     
     @NotNull(message = "User ID is required")
-    private UUID userId;
+    private String userId;
 }

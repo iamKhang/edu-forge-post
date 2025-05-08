@@ -56,7 +56,7 @@ public class SeriesController {
     
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<Page<SeriesResponse>>> getSeriesByUserId(
-            @PathVariable UUID userId,
+            @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -96,7 +96,7 @@ public class SeriesController {
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deleteSeries(
             @PathVariable String id,
-            @RequestParam UUID userId) {
+            @RequestParam String userId) {
         
         seriesService.deleteSeries(id, userId);
         return ResponseEntity.ok(ApiResponse.success("Series deleted successfully", null));
@@ -107,7 +107,7 @@ public class SeriesController {
             @PathVariable String seriesId,
             @PathVariable String postId,
             @RequestParam int order,
-            @RequestParam UUID userId) {
+            @RequestParam String userId) {
         
         SeriesResponse updatedSeries = seriesService.addPostToSeries(seriesId, postId, order, userId);
         return ResponseEntity.ok(ApiResponse.success("Post added to series successfully", updatedSeries));
@@ -117,7 +117,7 @@ public class SeriesController {
     public ResponseEntity<ApiResponse<SeriesResponse>> removePostFromSeries(
             @PathVariable String seriesId,
             @PathVariable String postId,
-            @RequestParam UUID userId) {
+            @RequestParam String userId) {
         
         SeriesResponse updatedSeries = seriesService.removePostFromSeries(seriesId, postId, userId);
         return ResponseEntity.ok(ApiResponse.success("Post removed from series successfully", updatedSeries));
@@ -128,7 +128,7 @@ public class SeriesController {
             @PathVariable String seriesId,
             @PathVariable String postId,
             @RequestParam int newOrder,
-            @RequestParam UUID userId) {
+            @RequestParam String userId) {
         
         SeriesResponse updatedSeries = seriesService.updatePostOrderInSeries(seriesId, postId, newOrder, userId);
         return ResponseEntity.ok(ApiResponse.success("Post order updated successfully", updatedSeries));

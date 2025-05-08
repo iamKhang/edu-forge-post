@@ -26,7 +26,7 @@ public class Series {
     private String id;
     
     @Indexed
-    private UUID userId;  // Reference to the user in the user service
+    private String userId;  // Reference to the user in the user service
     
     private String title;
     

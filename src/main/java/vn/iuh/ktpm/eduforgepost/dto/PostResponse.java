@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class PostResponse {
 
     private String id;
-    private UUID userId;
+    private String userId;
     private String title;
     private String content;
     private String coverImage;

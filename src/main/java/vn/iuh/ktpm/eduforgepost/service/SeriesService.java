@@ -79,7 +79,7 @@ public class SeriesService {
         return series.map(this::mapToSeriesResponse);
     }
     
-    public Page<SeriesResponse> getSeriesByUserId(UUID userId, Pageable pageable) {
+    public Page<SeriesResponse> getSeriesByUserId(String userId, Pageable pageable) {
         Page<Series> series = seriesRepository.findByUserId(userId, pageable);
         return series.map(this::mapToSeriesResponse);
     }
@@ -157,7 +157,7 @@ public class SeriesService {
     }
     
     @Transactional
-    public void deleteSeries(String id, UUID userId) {
+    public void deleteSeries(String id, String userId) {
         Series series = seriesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Series", "id", id));
         
@@ -180,7 +180,7 @@ public class SeriesService {
     }
     
     @Transactional
-    public SeriesResponse addPostToSeries(String seriesId, String postId, int order, UUID userId) {
+    public SeriesResponse addPostToSeries(String seriesId, String postId, int order, String userId) {
         Series series = seriesRepository.findById(seriesId)
                 .orElseThrow(() -> new ResourceNotFoundException("Series", "id", seriesId));
         
@@ -227,7 +227,7 @@ public class SeriesService {
     }
     
     @Transactional
-    public SeriesResponse removePostFromSeries(String seriesId, String postId, UUID userId) {
+    public SeriesResponse removePostFromSeries(String seriesId, String postId, String userId) {
         Series series = seriesRepository.findById(seriesId)
                 .orElseThrow(() -> new ResourceNotFoundException("Series", "id", seriesId));
         
@@ -256,7 +256,7 @@ public class SeriesService {
     }
     
     @Transactional
-    public SeriesResponse updatePostOrderInSeries(String seriesId, String postId, int newOrder, UUID userId) {
+    public SeriesResponse updatePostOrderInSeries(String seriesId, String postId, int newOrder, String userId) {
         Series series = seriesRepository.findById(seriesId)
                 .orElseThrow(() -> new ResourceNotFoundException("Series", "id", seriesId));
         
@@ -286,7 +286,7 @@ public class SeriesService {
         return mapToSeriesResponse(updatedSeries);
     }
     
-    private void validatePostsExistAndBelongToUser(List<String> postIds, UUID userId) {
+    private void validatePostsExistAndBelongToUser(List<String> postIds, String userId) {
         if (postIds.isEmpty()) {
             return;
         }

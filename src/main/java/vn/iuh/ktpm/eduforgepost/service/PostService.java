@@ -46,45 +46,45 @@ public class PostService {
         return mapToPostResponse(savedPost, postRequest.getUserId());
     }
 
-    public PostResponse getPostById(String id, UUID currentUserId) {
+    public PostResponse getPostById(String id, String currentUserId) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
 
         return mapToPostResponse(post, currentUserId);
     }
 
-    public Page<PostResponse> getAllPosts(Pageable pageable, UUID currentUserId) {
+    public Page<PostResponse> getAllPosts(Pageable pageable, String currentUserId) {
         Page<Post> posts = postRepository.findByIsPublishedTrue(pageable);
         return posts.map(post -> mapToPostResponse(post, currentUserId));
     }
 
-    public Page<PostResponse> getPostsByUserId(UUID userId, Pageable pageable, UUID currentUserId) {
+    public Page<PostResponse> getPostsByUserId(String userId, Pageable pageable, String currentUserId) {
         Page<Post> posts = postRepository.findByUserId(userId, pageable);
         return posts.map(post -> mapToPostResponse(post, currentUserId));
     }
 
-    public Page<PostResponse> searchPosts(String keyword, Pageable pageable, UUID currentUserId) {
+    public Page<PostResponse> searchPosts(String keyword, Pageable pageable, String currentUserId) {
         Page<Post> posts = postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(
                 keyword, keyword, pageable);
         return posts.map(post -> mapToPostResponse(post, currentUserId));
     }
 
-    public Page<PostResponse> getPostsByTag(String tag, Pageable pageable, UUID currentUserId) {
+    public Page<PostResponse> getPostsByTag(String tag, Pageable pageable, String currentUserId) {
         Page<Post> posts = postRepository.findByTagsContaining(tag, pageable);
         return posts.map(post -> mapToPostResponse(post, currentUserId));
     }
 
-    public Page<PostResponse> getPostsBySeriesId(String seriesId, Pageable pageable, UUID currentUserId) {
+    public Page<PostResponse> getPostsBySeriesId(String seriesId, Pageable pageable, String currentUserId) {
         Page<Post> posts = postRepository.findBySeriesId(seriesId, pageable);
         return posts.map(post -> mapToPostResponse(post, currentUserId));
     }
 
-    public Page<PostResponse> getPostsWithoutSeries(Pageable pageable, UUID currentUserId) {
+    public Page<PostResponse> getPostsWithoutSeries(Pageable pageable, String currentUserId) {
         Page<Post> posts = postRepository.findBySeriesIdIsNull(pageable);
         return posts.map(post -> mapToPostResponse(post, currentUserId));
     }
 
-    public Page<PostResponse> getUserPostsWithoutSeries(UUID userId, Pageable pageable, UUID currentUserId) {
+    public Page<PostResponse> getUserPostsWithoutSeries(String userId, Pageable pageable, String currentUserId) {
         Page<Post> posts = postRepository.findByUserIdAndSeriesIdIsNull(userId, pageable);
         return posts.map(post -> mapToPostResponse(post, currentUserId));
     }
@@ -160,7 +160,7 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(String id, UUID userId) {
+    public void deletePost(String id, String userId) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
 
@@ -184,7 +184,7 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    private PostResponse mapToPostResponse(Post post, UUID currentUserId) {
+    private PostResponse mapToPostResponse(Post post, String currentUserId) {
         boolean likedByCurrentUser = postLikeRepository.existsByPostIdAndUserId(post.getId(), currentUserId);
 
         // Get series information if post is part of a series

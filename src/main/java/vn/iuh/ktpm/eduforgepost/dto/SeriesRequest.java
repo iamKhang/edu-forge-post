@@ -18,7 +18,7 @@ import java.util.UUID;
 public class SeriesRequest {
     
     @NotNull(message = "User ID is required")
-    private UUID userId;
+    private String userId;
     
     @NotBlank(message = "Title is required")
     private String title;

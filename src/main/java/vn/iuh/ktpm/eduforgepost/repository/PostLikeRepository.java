@@ -13,13 +13,13 @@ public interface PostLikeRepository extends MongoRepository<PostLike, String> {
     
     List<PostLike> findByPostId(String postId);
     
-    List<PostLike> findByUserId(UUID userId);
+    List<PostLike> findByUserId(String userId);
     
-    Optional<PostLike> findByPostIdAndUserId(String postId, UUID userId);
+    Optional<PostLike> findByPostIdAndUserId(String postId, String userId);
     
-    boolean existsByPostIdAndUserId(String postId, UUID userId);
+    boolean existsByPostIdAndUserId(String postId, String userId);
     
     long countByPostId(String postId);
     
-    void deleteByPostIdAndUserId(String postId, UUID userId);
+    void deleteByPostIdAndUserId(String postId, String userId);
 }

@@ -14,9 +14,9 @@ public interface SeriesRepository extends MongoRepository<Series, String> {
     
     Page<Series> findByIsPublishedTrue(Pageable pageable);
     
-    Page<Series> findByUserId(UUID userId, Pageable pageable);
+    Page<Series> findByUserId(String userId, Pageable pageable);
     
-    List<Series> findByUserIdAndIsPublishedTrue(UUID userId);
+    List<Series> findByUserIdAndIsPublishedTrue(String userId);
     
     Page<Series> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
             String titleKeyword, String descriptionKeyword, Pageable pageable);
