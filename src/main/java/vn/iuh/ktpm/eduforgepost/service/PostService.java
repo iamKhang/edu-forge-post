@@ -216,6 +216,24 @@ public class PostService {
     }
 
     @Transactional
+    public PostResponse addView(String postId, String userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
+
+        // Only add view if user hasn't viewed this post before
+        if (userId != null && !post.getViews().stream()
+                .anyMatch(view -> view.getUserId().equals(userId))) {
+            post.getViews().add(Post.PostInteraction.builder()
+                    .userId(userId)
+                    .timestamp(LocalDateTime.now())
+                    .build());
+            postRepository.save(post);
+        }
+
+        return mapToPostResponse(post, userId);
+    }
+
+    @Transactional
     public PostResponse toggleLike(String postId, String userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
@@ -244,6 +262,9 @@ public class PostService {
     private PostResponse mapToPostResponse(Post post, String currentUserId) {
         boolean likedByCurrentUser = currentUserId != null && post.getLikes().stream()
                 .anyMatch(like -> like.getUserId().equals(currentUserId));
+        
+        boolean viewedByCurrentUser = currentUserId != null && post.getViews().stream()
+                .anyMatch(view -> view.getUserId().equals(currentUserId));
 
         // Get series information if post is part of a series
         String seriesTitle = null;
@@ -272,25 +293,16 @@ public class PostService {
                 .content(post.getContent())
                 .coverImage(post.getCoverImage())
                 .tags(post.getTags())
-                .likes(post.getLikes().stream()
-                        .map(like -> PostResponse.PostInteractionResponse.builder()
-                                .userId(like.getUserId())
-                                .timestamp(like.getTimestamp())
-                                .build())
-                        .collect(Collectors.toList()))
-                .views(post.getViews().stream()
-                        .map(view -> PostResponse.PostInteractionResponse.builder()
-                                .userId(view.getUserId())
-                                .timestamp(view.getTimestamp())
-                                .build())
-                        .collect(Collectors.toList()))
+                .totalLikes(post.getLikes().size())
+                .totalViews(post.getViews().size())
+                .likedByCurrentUser(likedByCurrentUser)
+                .viewedByCurrentUser(viewedByCurrentUser)
                 .isPublished(post.isPublished())
                 .seriesId(post.getSeriesId())
                 .seriesTitle(seriesTitle)
                 .orderInSeries(orderInSeries)
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
-                .likedByCurrentUser(likedByCurrentUser)
                 .build();
     }
 }

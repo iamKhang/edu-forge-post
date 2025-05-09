@@ -209,4 +209,20 @@ public class PostController {
         postService.deletePost(id, userId);
         return ResponseEntity.ok(ApiResponse.success("Post deleted successfully", null));
     }
+
+    @PostMapping("/{id}/view")
+    public ResponseEntity<ApiResponse<PostResponse>> addView(
+            @PathVariable String id,
+            @RequestParam String userId) {
+        PostResponse post = postService.addView(id, userId);
+        return ResponseEntity.ok(ApiResponse.success(post));
+    }
+
+    @PostMapping("/{id}/like")
+    public ResponseEntity<ApiResponse<PostResponse>> toggleLike(
+            @PathVariable String id,
+            @RequestParam String userId) {
+        PostResponse post = postService.toggleLike(id, userId);
+        return ResponseEntity.ok(ApiResponse.success(post));
+    }
 }
