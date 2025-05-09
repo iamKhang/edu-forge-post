@@ -43,6 +43,29 @@ public class PostService {
                 .build();
 
         Post savedPost = postRepository.save(post);
+
+        // If post is part of a series, update the series
+        if (postRequest.getSeriesId() != null) {
+            Optional<Series> seriesOpt = seriesRepository.findById(postRequest.getSeriesId());
+            if (seriesOpt.isPresent()) {
+                Series series = seriesOpt.get();
+                
+                // Get the current max order in the series
+                int maxOrder = series.getPosts().stream()
+                        .mapToInt(Series.SeriesItem::getOrder)
+                        .max()
+                        .orElse(0);
+
+                // Add the new post to the series
+                series.getPosts().add(Series.SeriesItem.builder()
+                        .postId(savedPost.getId())
+                        .order(maxOrder + 1)
+                        .build());
+
+                seriesRepository.save(series);
+            }
+        }
+
         return mapToPostResponse(savedPost, postRequest.getUserId());
     }
 
