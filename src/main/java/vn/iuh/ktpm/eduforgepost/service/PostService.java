@@ -16,7 +16,6 @@ import vn.iuh.ktpm.eduforgepost.dto.PostResponse;
 import vn.iuh.ktpm.eduforgepost.exception.ResourceNotFoundException;
 import vn.iuh.ktpm.eduforgepost.model.Post;
 import vn.iuh.ktpm.eduforgepost.model.Series;
-import vn.iuh.ktpm.eduforgepost.repository.PostLikeRepository;
 import vn.iuh.ktpm.eduforgepost.repository.PostRepository;
 import vn.iuh.ktpm.eduforgepost.repository.SeriesRepository;
 
@@ -25,7 +24,6 @@ import vn.iuh.ktpm.eduforgepost.repository.SeriesRepository;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final PostLikeRepository postLikeRepository;
     private final SeriesRepository seriesRepository;
 
     @Transactional
@@ -72,6 +70,16 @@ public class PostService {
     public PostResponse getPostById(String id, String currentUserId) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post", "id", id));
+
+        // Add view if user hasn't viewed this post before
+        if (currentUserId != null && !post.getViews().stream()
+                .anyMatch(view -> view.getUserId().equals(currentUserId))) {
+            post.getViews().add(Post.PostInteraction.builder()
+                    .userId(currentUserId)
+                    .timestamp(LocalDateTime.now())
+                    .build());
+            postRepository.save(post);
+        }
 
         return mapToPostResponse(post, currentUserId);
     }
@@ -207,8 +215,35 @@ public class PostService {
         postRepository.delete(post);
     }
 
+    @Transactional
+    public PostResponse toggleLike(String postId, String userId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException("Post", "id", postId));
+
+        // Check if user has already liked the post
+        boolean hasLiked = post.getLikes().stream()
+                .anyMatch(like -> like.getUserId().equals(userId));
+
+        if (hasLiked) {
+            // Remove like
+            post.setLikes(post.getLikes().stream()
+                    .filter(like -> !like.getUserId().equals(userId))
+                    .collect(Collectors.toList()));
+        } else {
+            // Add like
+            post.getLikes().add(Post.PostInteraction.builder()
+                    .userId(userId)
+                    .timestamp(LocalDateTime.now())
+                    .build());
+        }
+
+        Post updatedPost = postRepository.save(post);
+        return mapToPostResponse(updatedPost, userId);
+    }
+
     private PostResponse mapToPostResponse(Post post, String currentUserId) {
-        boolean likedByCurrentUser = postLikeRepository.existsByPostIdAndUserId(post.getId(), currentUserId);
+        boolean likedByCurrentUser = currentUserId != null && post.getLikes().stream()
+                .anyMatch(like -> like.getUserId().equals(currentUserId));
 
         // Get series information if post is part of a series
         String seriesTitle = null;
@@ -237,7 +272,18 @@ public class PostService {
                 .content(post.getContent())
                 .coverImage(post.getCoverImage())
                 .tags(post.getTags())
-                .likeCount(post.getLikeCount())
+                .likes(post.getLikes().stream()
+                        .map(like -> PostResponse.PostInteractionResponse.builder()
+                                .userId(like.getUserId())
+                                .timestamp(like.getTimestamp())
+                                .build())
+                        .collect(Collectors.toList()))
+                .views(post.getViews().stream()
+                        .map(view -> PostResponse.PostInteractionResponse.builder()
+                                .userId(view.getUserId())
+                                .timestamp(view.getTimestamp())
+                                .build())
+                        .collect(Collectors.toList()))
                 .isPublished(post.isPublished())
                 .seriesId(post.getSeriesId())
                 .seriesTitle(seriesTitle)

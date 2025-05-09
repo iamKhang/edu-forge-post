@@ -1,39 +1,29 @@
 package vn.iuh.ktpm.eduforgepost.repository;
 
-import java.util.List;
-import java.util.UUID;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import vn.iuh.ktpm.eduforgepost.model.Post;
 
 @Repository
 public interface PostRepository extends MongoRepository<Post, String> {
-
+    
     Page<Post> findByIsPublishedTrue(Pageable pageable);
-
+    
     Page<Post> findByUserId(String userId, Pageable pageable);
-
-    List<Post> findByUserIdAndIsPublishedTrue(String userId);
-
+    
+    @Query("{'$or': [{'title': {$regex: ?0, $options: 'i'}}, {'content': {$regex: ?1, $options: 'i'}}]}")
     Page<Post> findByTitleContainingIgnoreCaseOrContentContainingIgnoreCase(
-            String titleKeyword, String contentKeyword, Pageable pageable);
-
+            String title, String content, Pageable pageable);
+    
     Page<Post> findByTagsContaining(String tag, Pageable pageable);
-
-    // Series related queries
-    List<Post> findBySeriesId(String seriesId);
-
+    
     Page<Post> findBySeriesId(String seriesId, Pageable pageable);
-
-    List<Post> findBySeriesIdAndIsPublishedTrue(String seriesId);
-
-    // Find posts that are not part of any series
+    
     Page<Post> findBySeriesIdIsNull(Pageable pageable);
-
-    // Find posts that are not part of any series for a specific user
+    
     Page<Post> findByUserIdAndSeriesIdIsNull(String userId, Pageable pageable);
 }

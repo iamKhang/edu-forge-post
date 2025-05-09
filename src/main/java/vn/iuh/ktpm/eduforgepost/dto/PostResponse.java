@@ -23,7 +23,8 @@ public class PostResponse {
     private String coverImage;
     @Builder.Default
     private List<String> tags = new ArrayList<>();
-    private int likeCount;
+    private List<PostInteractionResponse> likes;
+    private List<PostInteractionResponse> views;
     private boolean isPublished;
 
     // Series information
@@ -34,4 +35,13 @@ public class PostResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean likedByCurrentUser;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PostInteractionResponse {
+        private String userId;
+        private LocalDateTime timestamp;
+    }
 }

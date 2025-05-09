@@ -39,7 +39,10 @@ public class Post {
     private List<String> tags = new ArrayList<>();
 
     @Builder.Default
-    private int likeCount = 0;
+    private List<PostInteraction> likes = new ArrayList<>();
+
+    @Builder.Default
+    private List<PostInteraction> views = new ArrayList<>();
 
     @Builder.Default
     private boolean isPublished = true;
@@ -52,4 +55,13 @@ public class Post {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PostInteraction {
+        private String userId;
+        private LocalDateTime timestamp;
+    }
 }
