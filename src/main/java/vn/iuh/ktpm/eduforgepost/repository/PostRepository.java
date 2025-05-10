@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 
 import vn.iuh.ktpm.eduforgepost.model.Post;
 
+import java.util.List;
+
 @Repository
 public interface PostRepository extends MongoRepository<Post, String> {
     
@@ -34,4 +36,12 @@ public interface PostRepository extends MongoRepository<Post, String> {
     long countBySeriesIdIsNotNull();
     
     long countBySeriesIdIsNull();
+    
+    /**
+     * Find all posts with IDs in the given list
+     * 
+     * @param ids list of post IDs
+     * @return list of posts
+     */
+    List<Post> findAllByIdIn(List<String> ids);
 }
