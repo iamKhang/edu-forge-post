@@ -1,5 +1,7 @@
 package vn.iuh.ktpm.eduforgepost.controller;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import vn.iuh.ktpm.eduforgepost.dto.ApiResponse;
 import vn.iuh.ktpm.eduforgepost.dto.PostRequest;
 import vn.iuh.ktpm.eduforgepost.dto.PostResponse;
+import vn.iuh.ktpm.eduforgepost.model.Post;
 import vn.iuh.ktpm.eduforgepost.service.PostService;
 
 @RestController
@@ -224,5 +227,26 @@ public class PostController {
             @RequestParam String userId) {
         PostResponse post = postService.toggleLike(id, userId);
         return ResponseEntity.ok(ApiResponse.success(post));
+    }
+
+    @GetMapping("/training-data")
+    public ResponseEntity<Page<Post>> getTrainingData(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1000") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> posts = postService.getRawPostsForTraining(pageable);
+        return ResponseEntity.ok(posts);
+    }
+
+    @GetMapping("/training-data/all")
+    public ResponseEntity<List<Post>> getAllTrainingData() {
+        List<Post> posts = postService.getAllRawPostsForTraining();
+        return ResponseEntity.ok(posts);
+    }
+
+    @GetMapping("/training-data/statistics")
+    public ResponseEntity<Map<String, Object>> getTrainingDataStatistics() {
+        Map<String, Object> statistics = postService.getTrainingDataStatistics();
+        return ResponseEntity.ok(statistics);
     }
 }

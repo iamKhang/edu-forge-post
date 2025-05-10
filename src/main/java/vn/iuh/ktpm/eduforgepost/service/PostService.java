@@ -1,6 +1,8 @@
 package vn.iuh.ktpm.eduforgepost.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -257,6 +259,24 @@ public class PostService {
 
         Post updatedPost = postRepository.save(post);
         return mapToPostResponse(updatedPost, userId);
+    }
+
+    public Page<Post> getRawPostsForTraining(Pageable pageable) {
+        return postRepository.findAll(pageable);
+    }
+
+    public List<Post> getAllRawPostsForTraining() {
+        return postRepository.findAll();
+    }
+
+    public Map<String, Object> getTrainingDataStatistics() {
+        Map<String, Object> statistics = new java.util.HashMap<>();
+        statistics.put("totalPosts", postRepository.count());
+        statistics.put("totalPublishedPosts", postRepository.countByIsPublishedTrue());
+        statistics.put("totalUnpublishedPosts", postRepository.countByIsPublishedFalse());
+        statistics.put("totalPostsWithSeries", postRepository.countBySeriesIdIsNotNull());
+        statistics.put("totalPostsWithoutSeries", postRepository.countBySeriesIdIsNull());
+        return statistics;
     }
 
     private PostResponse mapToPostResponse(Post post, String currentUserId) {

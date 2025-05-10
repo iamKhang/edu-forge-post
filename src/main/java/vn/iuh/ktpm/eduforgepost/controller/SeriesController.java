@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import vn.iuh.ktpm.eduforgepost.dto.ApiResponse;
 import vn.iuh.ktpm.eduforgepost.dto.SeriesRequest;
 import vn.iuh.ktpm.eduforgepost.dto.SeriesResponse;
+import vn.iuh.ktpm.eduforgepost.model.Series;
 import vn.iuh.ktpm.eduforgepost.service.SeriesService;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -132,5 +135,26 @@ public class SeriesController {
         
         SeriesResponse updatedSeries = seriesService.updatePostOrderInSeries(seriesId, postId, newOrder, userId);
         return ResponseEntity.ok(ApiResponse.success("Post order updated successfully", updatedSeries));
+    }
+    
+    @GetMapping("/training-data")
+    public ResponseEntity<Page<Series>> getTrainingData(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1000") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Series> series = seriesService.getRawSeriesForTraining(pageable);
+        return ResponseEntity.ok(series);
+    }
+
+    @GetMapping("/training-data/all")
+    public ResponseEntity<List<Series>> getAllTrainingData() {
+        List<Series> series = seriesService.getAllRawSeriesForTraining();
+        return ResponseEntity.ok(series);
+    }
+
+    @GetMapping("/training-data/statistics")
+    public ResponseEntity<Map<String, Object>> getTrainingDataStatistics() {
+        Map<String, Object> statistics = seriesService.getTrainingDataStatistics();
+        return ResponseEntity.ok(statistics);
     }
 }

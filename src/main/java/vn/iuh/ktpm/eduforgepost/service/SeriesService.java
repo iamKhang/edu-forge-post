@@ -366,4 +366,32 @@ public class SeriesService {
                 .updatedAt(series.getUpdatedAt())
                 .build();
     }
+
+    public Page<Series> getRawSeriesForTraining(Pageable pageable) {
+        return seriesRepository.findAll(pageable);
+    }
+
+    public List<Series> getAllRawSeriesForTraining() {
+        return seriesRepository.findAll();
+    }
+
+    public Map<String, Object> getTrainingDataStatistics() {
+        Map<String, Object> statistics = new java.util.HashMap<>();
+        statistics.put("totalSeries", seriesRepository.count());
+        statistics.put("totalPublishedSeries", seriesRepository.countByIsPublishedTrue());
+        statistics.put("totalUnpublishedSeries", seriesRepository.countByIsPublishedFalse());
+        statistics.put("averagePostsPerSeries", calculateAveragePostsPerSeries());
+        return statistics;
+    }
+
+    private double calculateAveragePostsPerSeries() {
+        List<Series> allSeries = seriesRepository.findAll();
+        if (allSeries.isEmpty()) {
+            return 0.0;
+        }
+        double totalPosts = allSeries.stream()
+                .mapToInt(series -> series.getPosts().size())
+                .sum();
+        return totalPosts / allSeries.size();
+    }
 }

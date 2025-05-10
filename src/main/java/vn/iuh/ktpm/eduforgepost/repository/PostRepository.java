@@ -26,4 +26,12 @@ public interface PostRepository extends MongoRepository<Post, String> {
     Page<Post> findBySeriesIdIsNull(Pageable pageable);
     
     Page<Post> findByUserIdAndSeriesIdIsNull(String userId, Pageable pageable);
+
+    long countByIsPublishedTrue();
+    
+    long countByIsPublishedFalse();
+    
+    long countBySeriesIdIsNotNull();
+    
+    long countBySeriesIdIsNull();
 }

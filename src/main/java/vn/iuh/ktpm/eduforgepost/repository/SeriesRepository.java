@@ -20,4 +20,8 @@ public interface SeriesRepository extends MongoRepository<Series, String> {
     
     Page<Series> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
             String titleKeyword, String descriptionKeyword, Pageable pageable);
+
+    long countByIsPublishedTrue();
+    
+    long countByIsPublishedFalse();
 }
