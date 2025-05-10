@@ -6,14 +6,17 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import vn.iuh.ktpm.eduforgepost.dto.RecommendedPostDto;
+import vn.iuh.ktpm.eduforgepost.dto.PostResponse;
 import vn.iuh.ktpm.eduforgepost.model.Post;
 import vn.iuh.ktpm.eduforgepost.model.Recommendation;
+import vn.iuh.ktpm.eduforgepost.model.Series;
 import vn.iuh.ktpm.eduforgepost.repository.PostRepository;
 import vn.iuh.ktpm.eduforgepost.repository.RecommendationRepository;
+import vn.iuh.ktpm.eduforgepost.repository.SeriesRepository;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +30,9 @@ public class RecommendationService {
 
     @Autowired
     private PostRepository postRepository;
+    
+    @Autowired
+    private SeriesRepository seriesRepository;
 
     /**
      * Save recommendations from recommendation API response
@@ -57,9 +63,9 @@ public class RecommendationService {
      * 
      * @param userId the user ID
      * @param pageable pagination information
-     * @return page of recommended post DTOs
+     * @return page of recommended posts in standard PostResponse format
      */
-    public Page<RecommendedPostDto> getRecommendedPostsForUser(String userId, Pageable pageable) {
+    public Page<PostResponse> getRecommendedPostsForUser(String userId, Pageable pageable) {
         // Get recommendation for the user
         Optional<Recommendation> recommendationOpt = recommendationRepository.findByUserId(userId);
         
@@ -95,22 +101,67 @@ public class RecommendationService {
         Map<String, Post> postMap = posts.stream()
                 .collect(Collectors.toMap(Post::getId, post -> post));
         
-        // Create DTOs
-        List<RecommendedPostDto> recommendedPostDtos = new ArrayList<>();
+        // Get all series IDs
+        List<String> seriesIds = posts.stream()
+                .map(Post::getSeriesId)
+                .filter(seriesId -> seriesId != null && !seriesId.isEmpty())
+                .distinct()
+                .collect(Collectors.toList());
+        
+        // Get all series
+        Map<String, Series> seriesMap = new HashMap<>();
+        if (!seriesIds.isEmpty()) {
+            List<Series> seriesList = seriesRepository.findAllById(seriesIds);
+            seriesMap = seriesList.stream()
+                    .collect(Collectors.toMap(Series::getId, series -> series));
+        }
+        
+        // Create PostResponse objects in the same order as the recommendations
+        List<PostResponse> postResponses = new ArrayList<>();
         for (Recommendation.RecommendedPost rec : pageRecommendations) {
             Post post = postMap.get(rec.getPostId());
             if (post != null) {
-                RecommendedPostDto dto = RecommendedPostDto.builder()
-                        .postId(post.getId())
-                        .title(post.getTitle())
-                        .coverImage(post.getCoverImage())
-                        .content(post.getContent())
-                        .score(rec.getScore())
-                        .build();
-                recommendedPostDtos.add(dto);
+                PostResponse response = mapPostToPostResponse(post, seriesMap);
+                postResponses.add(response);
             }
         }
         
-        return new PageImpl<>(recommendedPostDtos, pageable, allRecommendations.size());
+        return new PageImpl<>(postResponses, pageable, allRecommendations.size());
+    }
+    
+    /**
+     * Maps a Post entity to a PostResponse DTO
+     */
+    private PostResponse mapPostToPostResponse(Post post, Map<String, Series> seriesMap) {
+        PostResponse response = PostResponse.builder()
+                .id(post.getId())
+                .userId(post.getUserId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .coverImage(post.getCoverImage())
+                .tags(post.getTags())
+                .totalLikes(post.getLikes() != null ? post.getLikes().size() : 0)
+                .totalViews(post.getViews() != null ? post.getViews().size() : 0)
+                .isPublished(post.isPublished())
+                .seriesId(post.getSeriesId())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .build();
+        
+        // Add series information if post is part of a series
+        if (post.getSeriesId() != null && !post.getSeriesId().isEmpty() && seriesMap.containsKey(post.getSeriesId())) {
+            Series series = seriesMap.get(post.getSeriesId());
+            response.setSeriesTitle(series.getTitle());
+            
+            // Find the order in series
+            for (Series.SeriesItem item : series.getPosts()) {
+                if (item.getPostId().equals(post.getId())) {
+                    response.setOrderInSeries(item.getOrder());
+                    break;
+                }
+            }
+        }
+        
+        return response;
     }
 } 

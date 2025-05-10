@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import vn.iuh.ktpm.eduforgepost.dto.RecommendedPostDto;
+import vn.iuh.ktpm.eduforgepost.dto.PostResponse;
 import vn.iuh.ktpm.eduforgepost.service.RecommendationImportService;
 import vn.iuh.ktpm.eduforgepost.service.RecommendationService;
 
@@ -35,16 +35,16 @@ public class RecommendationController {
      * @param userId the user ID
      * @param page page number (0-based)
      * @param size page size
-     * @return page of recommended posts
+     * @return page of recommended posts in standard format
      */
     @GetMapping("/users/{userId}")
-    public ResponseEntity<Page<RecommendedPostDto>> getRecommendedPosts(
+    public ResponseEntity<Page<PostResponse>> getRecommendedPosts(
             @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<RecommendedPostDto> recommendedPosts = recommendationService.getRecommendedPostsForUser(userId, pageRequest);
+        Page<PostResponse> recommendedPosts = recommendationService.getRecommendedPostsForUser(userId, pageRequest);
         
         return ResponseEntity.ok(recommendedPosts);
     }
