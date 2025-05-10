@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: eduforge-post-app
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      - mongodb
+    networks:
+      - eduforge-network
+    restart: always
+
+  mongodb:
+    image: mongo:5.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    env_file:
+      - .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGODB_DATABASE}
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - eduforge-network
+    restart: always
+
+  # Comment phần recommendation-service vì không cần chạy lúc này
+  # recommendation-service:
+  #   image: recommendation-service:latest
+  #   ports:
+  #     - "8000:8000"
+  #   networks:
+  #     - eduforge-network
+  #   restart: always
+
+networks:
+  eduforge-network:
+    driver: bridge
+
+volumes:
+  mongodb-data: 
