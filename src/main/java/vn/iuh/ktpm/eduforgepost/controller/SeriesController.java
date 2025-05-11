@@ -35,8 +35,10 @@ public class SeriesController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<SeriesResponse>> getSeriesById(@PathVariable String id) {
-        SeriesResponse series = seriesService.getSeriesById(id);
+    public ResponseEntity<ApiResponse<SeriesResponse>> getSeriesById(
+            @PathVariable String id,
+            @RequestParam(required = false) String currentUserId) {
+        SeriesResponse series = seriesService.getSeriesById(id, currentUserId);
         return ResponseEntity.ok(ApiResponse.success(series));
     }
     
@@ -45,14 +47,15 @@ public class SeriesController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir) {
+            @RequestParam(defaultValue = "desc") String sortDir,
+            @RequestParam(required = false) String currentUserId) {
         
         Sort sort = sortDir.equalsIgnoreCase("asc") ? 
                 Sort.by(sortBy).ascending() : 
                 Sort.by(sortBy).descending();
         
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<SeriesResponse> series = seriesService.getAllSeries(pageable);
+        Page<SeriesResponse> series = seriesService.getAllSeries(pageable, currentUserId);
         
         return ResponseEntity.ok(ApiResponse.success(series));
     }
@@ -63,14 +66,15 @@ public class SeriesController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir) {
+            @RequestParam(defaultValue = "desc") String sortDir,
+            @RequestParam(required = false) String currentUserId) {
         
         Sort sort = sortDir.equalsIgnoreCase("asc") ? 
                 Sort.by(sortBy).ascending() : 
                 Sort.by(sortBy).descending();
         
         Pageable pageable = PageRequest.of(page, size, sort);
-        Page<SeriesResponse> series = seriesService.getSeriesByUserId(userId, pageable);
+        Page<SeriesResponse> series = seriesService.getSeriesByUserId(userId, pageable, currentUserId);
         
         return ResponseEntity.ok(ApiResponse.success(series));
     }
@@ -79,10 +83,11 @@ public class SeriesController {
     public ResponseEntity<ApiResponse<Page<SeriesResponse>>> searchSeries(
             @RequestParam String keyword,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String currentUserId) {
         
         Pageable pageable = PageRequest.of(page, size);
-        Page<SeriesResponse> series = seriesService.searchSeries(keyword, pageable);
+        Page<SeriesResponse> series = seriesService.searchSeries(keyword, pageable, currentUserId);
         
         return ResponseEntity.ok(ApiResponse.success(series));
     }

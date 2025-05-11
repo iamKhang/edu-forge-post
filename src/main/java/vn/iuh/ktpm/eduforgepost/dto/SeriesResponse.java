@@ -6,34 +6,36 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SeriesResponse {
-    
     private String id;
     private String userId;
     private String title;
     private String description;
     private String coverImage;
-    private List<SeriesItemDto> posts = new ArrayList<>();
-    private boolean isPublished;
+    private List<SeriesItemResponse> posts;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
+    private boolean published;
+
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SeriesItemDto {
+    public static class SeriesItemResponse {
         private String postId;
         private String postTitle;
         private String postCoverImage;
+        private String content;
         private int order;
+        private long totalLikes;
+        private long totalViews;
+        private boolean likedByCurrentUser;
+        private boolean viewedByCurrentUser;
     }
 }

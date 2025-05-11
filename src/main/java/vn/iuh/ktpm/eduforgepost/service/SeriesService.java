@@ -67,27 +67,27 @@ public class SeriesService {
         return mapToSeriesResponse(savedSeries);
     }
     
-    public SeriesResponse getSeriesById(String id) {
+    public SeriesResponse getSeriesById(String id, String currentUserId) {
         Series series = seriesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Series", "id", id));
         
-        return mapToSeriesResponse(series);
+        return mapToSeriesResponse(series, currentUserId);
     }
     
-    public Page<SeriesResponse> getAllSeries(Pageable pageable) {
+    public Page<SeriesResponse> getAllSeries(Pageable pageable, String currentUserId) {
         Page<Series> series = seriesRepository.findByIsPublishedTrue(pageable);
-        return series.map(this::mapToSeriesResponse);
+        return series.map(s -> mapToSeriesResponse(s, currentUserId));
     }
     
-    public Page<SeriesResponse> getSeriesByUserId(String userId, Pageable pageable) {
+    public Page<SeriesResponse> getSeriesByUserId(String userId, Pageable pageable, String currentUserId) {
         Page<Series> series = seriesRepository.findByUserId(userId, pageable);
-        return series.map(this::mapToSeriesResponse);
+        return series.map(s -> mapToSeriesResponse(s, currentUserId));
     }
     
-    public Page<SeriesResponse> searchSeries(String keyword, Pageable pageable) {
+    public Page<SeriesResponse> searchSeries(String keyword, Pageable pageable, String currentUserId) {
         Page<Series> series = seriesRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
                 keyword, keyword, pageable);
-        return series.map(this::mapToSeriesResponse);
+        return series.map(s -> mapToSeriesResponse(s, currentUserId));
     }
     
     @Transactional
@@ -327,44 +327,58 @@ public class SeriesService {
         postRepository.saveAll(posts);
     }
     
-    private SeriesResponse mapToSeriesResponse(Series series) {
+    private SeriesResponse mapToSeriesResponse(Series series, String currentUserId) {
         // Get all posts in the series
-        List<String> postIds = series.getPosts().stream()
+        List<Post> posts = postRepository.findAllById(
+            series.getPosts().stream()
                 .map(Series.SeriesItem::getPostId)
-                .collect(Collectors.toList());
-        
-        Map<String, Post> postsMap = postRepository.findAllById(postIds).stream()
-                .collect(Collectors.toMap(Post::getId, Function.identity()));
-        
-        // Map series items to DTOs
-        List<SeriesResponse.SeriesItemDto> seriesItems = new ArrayList<>();
-        
-        for (Series.SeriesItem item : series.getPosts()) {
-            Post post = postsMap.get(item.getPostId());
-            if (post != null) {
-                seriesItems.add(SeriesResponse.SeriesItemDto.builder()
-                        .postId(item.getPostId())
-                        .postTitle(post.getTitle())
-                        .postCoverImage(post.getCoverImage())
-                        .order(item.getOrder())
-                        .build());
-            }
-        }
-        
-        // Sort series items by order
-        seriesItems.sort((a, b) -> Integer.compare(a.getOrder(), b.getOrder()));
-        
+                .collect(Collectors.toList())
+        );
+
+        // Create a map of post IDs to posts for quick lookup
+        Map<String, Post> postMap = posts.stream()
+            .collect(Collectors.toMap(Post::getId, Function.identity()));
+
+        // Create series items with full post information
+        List<SeriesResponse.SeriesItemResponse> seriesItems = series.getPosts().stream()
+            .map(item -> {
+                Post post = postMap.get(item.getPostId());
+                if (post == null) {
+                    return null;
+                }
+                return SeriesResponse.SeriesItemResponse.builder()
+                    .postId(post.getId())
+                    .postTitle(post.getTitle())
+                    .postCoverImage(post.getCoverImage())
+                    .content(post.getContent())
+                    .order(item.getOrder())
+                    .totalLikes(post.getLikes() != null ? post.getLikes().size() : 0)
+                    .totalViews(post.getViews() != null ? post.getViews().size() : 0)
+                    .likedByCurrentUser(currentUserId != null && post.getLikes() != null && 
+                        post.getLikes().stream().anyMatch(like -> like.getUserId().equals(currentUserId)))
+                    .viewedByCurrentUser(currentUserId != null && post.getViews() != null && 
+                        post.getViews().stream().anyMatch(view -> view.getUserId().equals(currentUserId)))
+                    .build();
+            })
+            .filter(item -> item != null)
+            .collect(Collectors.toList());
+
         return SeriesResponse.builder()
-                .id(series.getId())
-                .userId(series.getUserId())
-                .title(series.getTitle())
-                .description(series.getDescription())
-                .coverImage(series.getCoverImage())
-                .posts(seriesItems)
-                .isPublished(series.isPublished())
-                .createdAt(series.getCreatedAt())
-                .updatedAt(series.getUpdatedAt())
-                .build();
+            .id(series.getId())
+            .userId(series.getUserId())
+            .title(series.getTitle())
+            .description(series.getDescription())
+            .coverImage(series.getCoverImage())
+            .posts(seriesItems)
+            .createdAt(series.getCreatedAt())
+            .updatedAt(series.getUpdatedAt())
+            .published(series.isPublished())
+            .build();
+    }
+
+    // Keep the old method for backward compatibility
+    private SeriesResponse mapToSeriesResponse(Series series) {
+        return mapToSeriesResponse(series, null);
     }
 
     public Page<Series> getRawSeriesForTraining(Pageable pageable) {

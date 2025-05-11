@@ -65,7 +65,7 @@ public class RecommendationService {
      * @param pageable pagination information
      * @return page of recommended posts in standard PostResponse format
      */
-    public Page<PostResponse> getRecommendedPostsForUser(String userId, Pageable pageable) {
+    public Page<PostResponse> getRecommendedPostsForUser(String userId, Pageable pageable, String currentUserId) {
         // Get recommendation for the user
         Optional<Recommendation> recommendationOpt = recommendationRepository.findByUserId(userId);
         
@@ -121,7 +121,7 @@ public class RecommendationService {
         for (Recommendation.RecommendedPost rec : pageRecommendations) {
             Post post = postMap.get(rec.getPostId());
             if (post != null) {
-                PostResponse response = mapPostToPostResponse(post, seriesMap);
+                PostResponse response = mapPostToPostResponse(post, seriesMap, currentUserId);
                 postResponses.add(response);
             }
         }
@@ -132,7 +132,13 @@ public class RecommendationService {
     /**
      * Maps a Post entity to a PostResponse DTO
      */
-    private PostResponse mapPostToPostResponse(Post post, Map<String, Series> seriesMap) {
+    private PostResponse mapPostToPostResponse(Post post, Map<String, Series> seriesMap, String currentUserId) {
+        boolean likedByCurrentUser = currentUserId != null && post.getLikes() != null && 
+                post.getLikes().stream().anyMatch(like -> like.getUserId().equals(currentUserId));
+        
+        boolean viewedByCurrentUser = currentUserId != null && post.getViews() != null && 
+                post.getViews().stream().anyMatch(view -> view.getUserId().equals(currentUserId));
+
         PostResponse response = PostResponse.builder()
                 .id(post.getId())
                 .userId(post.getUserId())
@@ -142,6 +148,8 @@ public class RecommendationService {
                 .tags(post.getTags())
                 .totalLikes(post.getLikes() != null ? post.getLikes().size() : 0)
                 .totalViews(post.getViews() != null ? post.getViews().size() : 0)
+                .likedByCurrentUser(likedByCurrentUser)
+                .viewedByCurrentUser(viewedByCurrentUser)
                 .isPublished(post.isPublished())
                 .seriesId(post.getSeriesId())
                 .createdAt(post.getCreatedAt())

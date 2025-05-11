@@ -35,16 +35,18 @@ public class RecommendationController {
      * @param userId the user ID
      * @param page page number (0-based)
      * @param size page size
+     * @param currentUserId the current user ID
      * @return page of recommended posts in standard format
      */
     @GetMapping("/users/{userId}")
     public ResponseEntity<Page<PostResponse>> getRecommendedPosts(
             @PathVariable String userId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String currentUserId) {
         
         PageRequest pageRequest = PageRequest.of(page, size);
-        Page<PostResponse> recommendedPosts = recommendationService.getRecommendedPostsForUser(userId, pageRequest);
+        Page<PostResponse> recommendedPosts = recommendationService.getRecommendedPostsForUser(userId, pageRequest, currentUserId);
         
         return ResponseEntity.ok(recommendedPosts);
     }
