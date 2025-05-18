@@ -2,6 +2,7 @@ package vn.iuh.ktpm.eduforgepost.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import vn.iuh.ktpm.eduforgepost.model.Series;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 @Slf4j
@@ -39,10 +41,7 @@ public class MongoDataInitializer {
                 log.info("MongoDB Database: {}", mongoTemplate.getDb().getName());
                 
                 // Configure ObjectMapper with JavaTimeModule for handling dates
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.registerModule(new JavaTimeModule());
-                // Configure ObjectMapper to ignore unknown properties
-                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                ObjectMapper objectMapper = createConfiguredObjectMapper();
 
                 // Import posts
                 importData("edu_forge_post_db.posts.json", Post[].class, "posts");
@@ -58,6 +57,26 @@ public class MongoDataInitializer {
                 log.error("Error importing initial data: ", e);
             }
         };
+    }
+    
+    /**
+     * Creates a properly configured ObjectMapper for MongoDB data
+     */
+    private ObjectMapper createConfiguredObjectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        
+        // Register standard Java time module
+        objectMapper.registerModule(new JavaTimeModule());
+        
+        // Register custom MongoDB date deserializer
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(LocalDateTime.class, new MongoDateDeserializer());
+        objectMapper.registerModule(module);
+        
+        // Configure ObjectMapper to ignore unknown properties
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        
+        return objectMapper;
     }
 
     private <T> void importData(String jsonFile, Class<T[]> clazz, String collectionName) throws IOException {
@@ -80,10 +99,8 @@ public class MongoDataInitializer {
             
             log.info("Importing data into collection '{}'", collectionName);
             try (InputStream inputStream = resource.getInputStream()) {
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.registerModule(new JavaTimeModule());
-                // Configure ObjectMapper to ignore unknown properties like "_id"
-                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                // Use the configured ObjectMapper
+                ObjectMapper objectMapper = createConfiguredObjectMapper();
                 
                 T[] data = objectMapper.readValue(inputStream, clazz);
                 log.info("Successfully parsed {} documents from '{}'", data.length, jsonFile);
