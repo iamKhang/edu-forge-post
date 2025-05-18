@@ -59,6 +59,8 @@ public class MongoDataInitializer {
             try (InputStream inputStream = resource.getInputStream()) {
                 ObjectMapper objectMapper = new ObjectMapper();
                 objectMapper.registerModule(new JavaTimeModule());
+                // Configure ObjectMapper to ignore unknown properties like "_id"
+                objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 
                 T[] data = objectMapper.readValue(inputStream, clazz);
                 
