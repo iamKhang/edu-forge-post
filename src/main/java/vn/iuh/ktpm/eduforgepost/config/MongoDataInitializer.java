@@ -1,25 +1,23 @@
 package vn.iuh.ktpm.eduforgepost.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.InsertManyOptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import vn.iuh.ktpm.eduforgepost.model.Post;
-import vn.iuh.ktpm.eduforgepost.model.Recommendation;
-import vn.iuh.ktpm.eduforgepost.model.Series;
 
-import java.io.IOException;
+import java.io.BufferedReader;
 import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Configuration
@@ -40,17 +38,10 @@ public class MongoDataInitializer {
                 // Log MongoDB connection details
                 log.info("MongoDB Database: {}", mongoTemplate.getDb().getName());
                 
-                // Configure ObjectMapper with JavaTimeModule for handling dates
-                ObjectMapper objectMapper = createConfiguredObjectMapper();
-
-                // Import posts
-                importData("edu_forge_post_db.posts.json", Post[].class, "posts");
-
-                // Import series
-                importData("edu_forge_post_db.series.json", Series[].class, "series");
-
-                // Import recommendations
-                importData("edu_forge_post_db.recommendations.json", Recommendation[].class, "recommendations");
+                // Import collections
+                importCollection("edu_forge_post_db.posts.json", "posts");
+                importCollection("edu_forge_post_db.series.json", "series");
+                importCollection("edu_forge_post_db.recommendations.json", "recommendations");
 
                 log.info("Successfully imported initial data into MongoDB");
             } catch (Exception e) {
@@ -58,62 +49,116 @@ public class MongoDataInitializer {
             }
         };
     }
-    
-    /**
-     * Creates a properly configured ObjectMapper for MongoDB data
-     */
-    private ObjectMapper createConfiguredObjectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        
-        // Register standard Java time module
-        objectMapper.registerModule(new JavaTimeModule());
-        
-        // Register custom MongoDB date deserializer
-        SimpleModule module = new SimpleModule();
-        module.addDeserializer(LocalDateTime.class, new MongoDateDeserializer());
-        objectMapper.registerModule(module);
-        
-        // Configure ObjectMapper to ignore unknown properties
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        
-        return objectMapper;
-    }
 
-    private <T> void importData(String jsonFile, Class<T[]> clazz, String collectionName) throws IOException {
-        log.info("Checking collection '{}' for importing data from '{}'", collectionName, jsonFile);
-        
-        // Log if file exists in resources
-        ClassPathResource resource = new ClassPathResource(jsonFile);
-        boolean fileExists = resource.exists();
-        log.info("Resource file '{}' exists: {}", jsonFile, fileExists);
-        
-        // First, check if collection is empty or force import is enabled
-        long count = mongoTemplate.getCollection(collectionName).countDocuments();
-        log.info("Collection '{}' current document count: {}", collectionName, count);
-        
-        if (count == 0 || forceImport) {
-            if (forceImport && count > 0) {
-                log.info("Force import enabled. Dropping existing collection '{}'", collectionName);
-                mongoTemplate.dropCollection(collectionName);
+    private void importCollection(String jsonFile, String collectionName) {
+        try {
+            log.info("Checking collection '{}' for importing data from '{}'", collectionName, jsonFile);
+            
+            // Verify resource file exists
+            ClassPathResource resource = new ClassPathResource(jsonFile);
+            if (!resource.exists()) {
+                log.error("Resource file '{}' does not exist!", jsonFile);
+                return;
             }
             
-            log.info("Importing data into collection '{}'", collectionName);
-            try (InputStream inputStream = resource.getInputStream()) {
-                // Use the configured ObjectMapper
-                ObjectMapper objectMapper = createConfiguredObjectMapper();
+            // Get collection and check if empty
+            MongoCollection<Document> collection = mongoTemplate.getCollection(collectionName);
+            long count = collection.countDocuments();
+            log.info("Collection '{}' current document count: {}", collectionName, count);
+            
+            if (count == 0 || forceImport) {
+                // Drop existing collection if force import is enabled
+                if (forceImport && count > 0) {
+                    log.info("Force import enabled. Dropping existing collection '{}'", collectionName);
+                    mongoTemplate.dropCollection(collectionName);
+                }
                 
-                T[] data = objectMapper.readValue(inputStream, clazz);
-                log.info("Successfully parsed {} documents from '{}'", data.length, jsonFile);
+                // Read JSON content directly as string
+                String jsonContent;
+                try (InputStream is = resource.getInputStream();
+                     BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    jsonContent = sb.toString();
+                }
                 
-                // Insert all documents
-                Arrays.stream(data).forEach(item -> mongoTemplate.save(item, collectionName));
+                // Parse JSON array into list of documents
+                List<Document> documents = new ArrayList<>();
                 
-                log.info("Imported {} documents into '{}' collection", data.length, collectionName);
-            } catch (Exception e) {
-                log.error("Error importing data from '{}' to collection '{}': ", jsonFile, collectionName, e);
+                // Remove outer array brackets and split by document
+                String content = jsonContent.trim();
+                if (content.startsWith("[") && content.endsWith("]")) {
+                    content = content.substring(1, content.length() - 1);
+                }
+                
+                // Handle empty array case
+                if (content.trim().isEmpty()) {
+                    log.info("JSON file '{}' contains an empty array", jsonFile);
+                    return;
+                }
+                
+                // Parse each document in the array
+                int openBraces = 0;
+                int startIndex = 0;
+                boolean inQuotes = false;
+                boolean escaped = false;
+                
+                for (int i = 0; i < content.length(); i++) {
+                    char c = content.charAt(i);
+                    
+                    if (escaped) {
+                        escaped = false;
+                        continue;
+                    }
+                    
+                    if (c == '\\') {
+                        escaped = true;
+                        continue;
+                    }
+                    
+                    if (c == '"') {
+                        inQuotes = !inQuotes;
+                        continue;
+                    }
+                    
+                    if (inQuotes) {
+                        continue;
+                    }
+                    
+                    if (c == '{') {
+                        if (openBraces == 0) {
+                            startIndex = i;
+                        }
+                        openBraces++;
+                    } else if (c == '}') {
+                        openBraces--;
+                        if (openBraces == 0) {
+                            String documentJson = content.substring(startIndex, i + 1);
+                            documents.add(Document.parse(documentJson));
+                            
+                            // Skip comma and whitespace
+                            while (i + 1 < content.length() && (content.charAt(i + 1) == ',' || Character.isWhitespace(content.charAt(i + 1)))) {
+                                i++;
+                            }
+                        }
+                    }
+                }
+                
+                // Insert documents into collection
+                if (!documents.isEmpty()) {
+                    collection.insertMany(documents, new InsertManyOptions().ordered(false));
+                    log.info("Imported {} documents into '{}' collection", documents.size(), collectionName);
+                } else {
+                    log.warn("No documents were parsed from '{}'", jsonFile);
+                }
+            } else {
+                log.info("Collection '{}' already contains {} documents, skipping import", collectionName, count);
             }
-        } else {
-            log.info("Collection '{}' already contains {} documents, skipping import", collectionName, count);
+        } catch (Exception e) {
+            log.error("Error importing data from '{}' to collection '{}': {}", jsonFile, collectionName, e.getMessage(), e);
         }
     }
 } 
