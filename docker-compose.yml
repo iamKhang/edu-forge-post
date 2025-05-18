@@ -9,6 +9,8 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       - RECOMMENDATION_SERVICE_URL=http://eduforge-recommender:8000
+      - MONGODB_HOST=mongodb
+      - MONGODB_PORT=27017
     depends_on:
       - mongodb
     networks:

@@ -14,6 +14,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * MongoDB configuration class.
@@ -22,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 @Configuration
 @EnableMongoRepositories(basePackages = "vn.iuh.ktpm.eduforgepost.repository")
 public class MongoDBConfig extends AbstractMongoClientConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(MongoDBConfig.class);
 
     @Value("${spring.data.mongodb.host:localhost}")
     private String host;
@@ -49,6 +53,7 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
     @Override
     public MongoClient mongoClient() {
         if (uri != null && !uri.isEmpty()) {
+            logger.info("Connecting to MongoDB using URI: {}", uri.replaceAll(":[^:@/]+@", ":****@"));
             return MongoClients.create(uri);
         }
         
@@ -76,7 +81,9 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
             connectionString = String.format("mongodb://%s:%d/%s", host, port, database);
         }
         
-        return MongoClients.create(connectionString);
+        logger.info("Connecting to MongoDB at {}:{}", host, port);
+        MongoClient client = MongoClients.create(connectionString);
+        return client;
     }
     
     @Override
