@@ -1,17 +1,17 @@
 package vn.iuh.ktpm.eduforgepost.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import vn.iuh.ktpm.eduforgepost.model.Recommendation;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 public class RecommendationImportService {
@@ -24,7 +24,7 @@ public class RecommendationImportService {
     @Autowired
     private RestTemplate restTemplate;
     
-    @Value("${recommendation.service.url:http://eduforge-recommender:8000}")
+    @Value("${recommendation.service.url:https://recommender.eduforge.io.vn}")
     private String recommendationServiceUrl;
     
     /**
