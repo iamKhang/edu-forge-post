@@ -1,0 +1,150 @@
+[{
+  "_id": {
+    "$oid": "68200a872cfdc65b7441b361"
+  },
+  "userId": "680342fe32367c789ca11c81",
+  "hybridRecommendations": [
+    {
+      "postId": "681ed99c34e2e8793e544e7a",
+      "score": 0.3680086963506121
+    },
+    {
+      "postId": "682006ce2cfdc65b7441b35f",
+      "score": 0.3589387606469513
+    },
+    {
+      "postId": "6820085a2cfdc65b7441b360",
+      "score": 0.3438003197389299
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-05-11T02:25:11.459Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-18T03:37:31.984Z"
+  },
+  "_class": "vn.iuh.ktpm.eduforgepost.model.Recommendation"
+},
+{
+  "_id": {
+    "$oid": "68200a872cfdc65b7441b362"
+  },
+  "userId": "00000000-0000-0000-0000-000000000000",
+  "hybridRecommendations": [
+    {
+      "postId": "6820085a2cfdc65b7441b360",
+      "score": 0.3627680167632753
+    },
+    {
+      "postId": "682006ce2cfdc65b7441b35f",
+      "score": 0.3594986360160233
+    },
+    {
+      "postId": "681ed99c34e2e8793e544e7a",
+      "score": 0.2857431419821162
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-05-11T02:25:11.467Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-18T03:37:32.000Z"
+  },
+  "_class": "vn.iuh.ktpm.eduforgepost.model.Recommendation"
+},
+{
+  "_id": {
+    "$oid": "682552ac9969607a659c372d"
+  },
+  "userId": "68200d285e4e7bfbccf74fa1",
+  "hybridRecommendations": [
+    {
+      "postId": "681ed99c34e2e8793e544e7a",
+      "score": 0.5389872946472545
+    },
+    {
+      "postId": "682006ce2cfdc65b7441b35f",
+      "score": 0.2838994573441864
+    },
+    {
+      "postId": "6820085a2cfdc65b7441b360",
+      "score": 0.16191489846283738
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-05-15T02:34:20.848Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-18T03:37:32.003Z"
+  },
+  "_class": "vn.iuh.ktpm.eduforgepost.model.Recommendation"
+},
+{
+  "_id": {
+    "$oid": "6825537e9969607a659c372e"
+  },
+  "userId": "user1",
+  "hybridRecommendations": [
+    {
+      "postId": "post1",
+      "score": 0.9
+    },
+    {
+      "postId": "post2",
+      "score": 0.85
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-05-15T02:37:50.192Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-18T03:39:20.334Z"
+  },
+  "_class": "vn.iuh.ktpm.eduforgepost.model.Recommendation"
+},
+{
+  "_id": {
+    "$oid": "6825537e9969607a659c372f"
+  },
+  "userId": "user2",
+  "hybridRecommendations": [
+    {
+      "postId": "post2",
+      "score": 0.88
+    },
+    {
+      "postId": "post3",
+      "score": 0.82
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-05-15T02:37:50.214Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-18T03:39:20.342Z"
+  },
+  "_class": "vn.iuh.ktpm.eduforgepost.model.Recommendation"
+},
+{
+  "_id": {
+    "$oid": "6825537e9969607a659c3730"
+  },
+  "userId": "user3",
+  "hybridRecommendations": [
+    {
+      "postId": "post3",
+      "score": 0.86
+    },
+    {
+      "postId": "post4",
+      "score": 0.8
+    }
+  ],
+  "createdAt": {
+    "$date": "2025-05-15T02:37:50.222Z"
+  },
+  "updatedAt": {
+    "$date": "2025-05-18T03:39:20.347Z"
+  },
+  "_class": "vn.iuh.ktpm.eduforgepost.model.Recommendation"
+}]

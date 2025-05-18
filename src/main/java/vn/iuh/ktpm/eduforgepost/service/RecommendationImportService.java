@@ -1,6 +1,7 @@
 package vn.iuh.ktpm.eduforgepost.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -9,15 +10,22 @@ import vn.iuh.ktpm.eduforgepost.model.Recommendation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class RecommendationImportService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RecommendationImportService.class);
 
     @Autowired
     private RecommendationService recommendationService;
     
     @Autowired
     private RestTemplate restTemplate;
+    
+    @Value("${recommendation.service.url:http://eduforge-recommender:8000}")
+    private String recommendationServiceUrl;
     
     /**
      * Fetch recommendations from external API and save to database
@@ -27,11 +35,14 @@ public class RecommendationImportService {
     public boolean importRecommendations() {
         try {
             // Call the external recommendation API
-            String url = "http://localhost:8000/api/v1/interactions/train_and_recommend/";
+            String url = recommendationServiceUrl + "/api/v1/interactions/train_and_recommend/";
+            logger.info("Calling recommendation API at: {}", url);
+            
             Map<String, Object> response = restTemplate.getForObject(url, Map.class);
             
             if (response != null && response.containsKey("recommendations")) {
                 List<Map<String, Object>> recommendations = (List<Map<String, Object>>) response.get("recommendations");
+                logger.info("Received {} user recommendations", recommendations.size());
                 
                 for (Map<String, Object> userRec : recommendations) {
                     String userId = (String) userRec.get("user_id");
@@ -53,14 +64,16 @@ public class RecommendationImportService {
                     
                     // Save the recommendations
                     recommendationService.saveRecommendations(userId, recommendedPosts);
+                    logger.info("Saved {} recommendations for user {}", recommendedPosts.size(), userId);
                 }
                 
                 return true;
+            } else {
+                logger.error("Invalid response format, missing 'recommendations' field");
+                return false;
             }
-            
-            return false;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error importing recommendations: ", e);
             return false;
         }
     }
