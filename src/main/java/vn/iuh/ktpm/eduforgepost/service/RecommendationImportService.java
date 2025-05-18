@@ -24,7 +24,7 @@ public class RecommendationImportService {
     @Autowired
     private RestTemplate restTemplate;
     
-    @Value("${recommendation.service.url:http://eduforge-recommender:8000}")
+    @Value("${recommendation.service.url:http://eduforge-recommender:8090}")
     private String recommendationServiceUrl;
     
     /**

@@ -8,7 +8,7 @@ services:
       - .env
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - RECOMMENDATION_SERVICE_URL=http://eduforge-recommender:8000
+      - RECOMMENDATION_SERVICE_URL=http://eduforge-recommender:8090
     depends_on:
       - mongodb
     networks:
