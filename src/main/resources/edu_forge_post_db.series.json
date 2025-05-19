@@ -5,7 +5,7 @@
   "userId": "680342fe32367c789ca11c81",
   "title": "Design Parttern",
   "description": "Design patterns là một kỹ thuật trong lập trình hướng đối tượng, không phải là ngôn ngữ cụ thể nào cả, nó là một kĩ thuật lập trình. Nó có thể thực hiện được ở phần lớn các ngôn ngữ lập trình, chẳng hạn như Java, C#, thậm chí là Javascript hay bất kỳ ngôn ngữ lập trình nào khác Nó khá quan trọng và mọi lập trình viên muốn giỏi đều phải biết, nó cung cấp cho bạn các “mẫu thiết kế”, giải pháp để giải quyết các vấn đề chung, thường gặp trong lập trình. Các vấn đề mà bạn gặp phải có thể bạn sẽ tự nghĩ ra cách giải quyết nhưng có thể nó chưa phải là tối ưu.",
-  "coverImage": "https://supabasekong-a084okggcg0skwoooockog08.eduforge.io.vn/storage/v1/object/public/blogs/covers/9862e3c1-81b6-45f7-8b6b-ba0277192c9f.png",
+  "coverImage": "https://supabasekong-a084okggcg0skwoooockog08.bondhub.cloud/storage/v1/object/public/blogs/covers/9862e3c1-81b6-45f7-8b6b-ba0277192c9f.png",
   "posts": [
     {
       "postId": "681ed99c34e2e8793e544e7a",

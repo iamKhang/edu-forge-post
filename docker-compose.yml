@@ -5,7 +5,7 @@ services:
     ports:
       - "8081:8080"
     environment:
-      - RECOMMENDATION_SERVICE_URL=https://eduforge.io.vn:8090
+      - RECOMMENDATION_SERVICE_URL=https://bondhub.cloud:8090
       - MONGODB_HOST=mongodb
       - MONGODB_PORT=27017
       - MONGODB_DATABASE=eduforge_post
