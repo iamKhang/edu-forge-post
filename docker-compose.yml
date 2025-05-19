@@ -9,6 +9,9 @@ services:
       - MONGODB_HOST=mongodb
       - MONGODB_PORT=27017
       - MONGODB_DATABASE=eduforge_post
+      # Rõ ràng vô hiệu hóa xác thực MongoDB
+      - MONGODB_USERNAME=
+      - MONGODB_PASSWORD=
     depends_on:
       - mongodb
     networks:
@@ -21,6 +24,9 @@ services:
     # Không public port ra ngoài
     environment:
       - MONGO_INITDB_DATABASE=eduforge_post
+      # Không sử dụng xác thực
+      - MONGO_INITDB_ROOT_USERNAME=
+      - MONGO_INITDB_ROOT_PASSWORD=
     volumes:
       - mongodb-data:/data/db
     networks:
