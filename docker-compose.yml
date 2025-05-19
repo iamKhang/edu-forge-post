@@ -4,13 +4,11 @@ services:
     container_name: eduforge-post-app
     ports:
       - "8081:8080"
-    env_file:
-      - .env
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
       - RECOMMENDATION_SERVICE_URL=https://eduforge.io.vn:8090
       - MONGODB_HOST=mongodb
       - MONGODB_PORT=27017
+      - MONGODB_DATABASE=eduforge_post
     depends_on:
       - mongodb
     networks:
@@ -20,14 +18,9 @@ services:
   mongodb:
     image: mongo:5.0
     container_name: mongodb
-    ports:
-      - "27018:27017"
-    env_file:
-      - .env
+    # Không public port ra ngoài
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
-      - MONGO_INITDB_DATABASE=${MONGODB_DATABASE}
+      - MONGO_INITDB_DATABASE=eduforge_post
     volumes:
       - mongodb-data:/data/db
     networks:
@@ -36,7 +29,8 @@ services:
 
 networks:
   eduforge-network:
-    external: true
+    name: eduforge-network
+    driver: bridge
 
 volumes:
   mongodb-data:
