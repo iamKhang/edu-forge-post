@@ -35,8 +35,7 @@ services:
 
 networks:
   eduforge-network:
-    name: eduforge-network
-    driver: bridge
+    external: false
 
 volumes:
   mongodb-data:
