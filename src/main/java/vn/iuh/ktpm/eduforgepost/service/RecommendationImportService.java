@@ -24,7 +24,7 @@ public class RecommendationImportService {
     @Autowired
     private RestTemplate restTemplate;
     
-    @Value("${recommendation.service.url:https://bondhub.cloud:8090}")
+    @Value("${recommendation.service.url:http://bondhub.cloud:8090}")
     private String recommendationServiceUrl;
     
     /**
