@@ -1,0 +1,351 @@
+{
+	"info": {
+		"_postman_id": "1234567-1234-1234-1234-123456789012",
+		"name": "Edu Forge Post API",
+		"description": "Collection of API endpoints for Edu Forge Post application",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "Get Posts by Series ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/posts/series/:seriesId?page=0&size=10&sortBy=createdAt&sortDir=desc&currentUserId={{currentUserId}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "posts", "series", ":seriesId"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"},
+								{"key": "sortBy", "value": "createdAt"},
+								{"key": "sortDir", "value": "desc"},
+								{"key": "currentUserId", "value": "{{currentUserId}}"}
+							],
+							"variable": [
+								{"key": "seriesId", "value": ""}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Posts Without Series",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/posts/no-series?page=0&size=10&sortBy=createdAt&sortDir=desc&currentUserId={{currentUserId}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "posts", "no-series"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"},
+								{"key": "sortBy", "value": "createdAt"},
+								{"key": "sortDir", "value": "desc"},
+								{"key": "currentUserId", "value": "{{currentUserId}}"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Create Post",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/api/posts",
+							"host": ["{{base_url}}"],
+							"path": ["api", "posts"]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Sample Post\",\n  \"content\": \"Post content\",\n  \"userId\": \"{{userId}}\",\n  \"tags\": [\"tag1\", \"tag2\"],\n  \"seriesId\": \"optional-series-id\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Get Post by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/posts/:id?currentUserId={{currentUserId}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "posts", ":id"],
+							"query": [
+								{"key": "currentUserId", "value": "{{currentUserId}}"}
+							],
+							"variable": [
+								{"key": "id", "value": ""}
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Post",
+					"request": {
+						"method": "PUT",
+						"url": {
+							"raw": "{{base_url}}/api/posts/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "posts", ":id"],
+							"variable": [
+								{"key": "id", "value": ""}
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Post\",\n  \"content\": \"Updated content\",\n  \"tags\": [\"tag1\", \"tag2\"],\n  \"seriesId\": \"optional-series-id\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Delete Post",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{base_url}}/api/posts/:id?userId={{userId}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "posts", ":id"],
+							"query": [
+								{"key": "userId", "value": "{{userId}}"}
+							],
+							"variable": [
+								{"key": "id", "value": ""}
+							]
+						}
+					}
+				},
+				{
+					"name": "Add View",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/api/posts/:id/view?userId={{userId}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "posts", ":id", "view"],
+							"query": [
+								{"key": "userId", "value": "{{userId}}"}
+							],
+							"variable": [
+								{"key": "id", "value": ""}
+							]
+						}
+					}
+				},
+				{
+					"name": "Toggle Like",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/api/posts/:id/like?userId={{userId}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "posts", ":id", "like"],
+							"query": [
+								{"key": "userId", "value": "{{userId}}"}
+							],
+							"variable": [
+								{"key": "id", "value": ""}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Series",
+			"item": [
+				{
+					"name": "Create Series",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/api/series",
+							"host": ["{{base_url}}"],
+							"path": ["api", "series"]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Sample Series\",\n  \"description\": \"Series description\",\n  \"userId\": \"{{userId}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Get Series by ID",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/series/:id?currentUserId={{currentUserId}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "series", ":id"],
+							"query": [
+								{"key": "currentUserId", "value": "{{currentUserId}}"}
+							],
+							"variable": [
+								{"key": "id", "value": ""}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get All Series",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/series?page=0&size=10&sortBy=createdAt&sortDir=desc&currentUserId={{currentUserId}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "series"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"},
+								{"key": "sortBy", "value": "createdAt"},
+								{"key": "sortDir", "value": "desc"},
+								{"key": "currentUserId", "value": "{{currentUserId}}"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Update Series",
+					"request": {
+						"method": "PUT",
+						"url": {
+							"raw": "{{base_url}}/api/series/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "series", ":id"],
+							"variable": [
+								{"key": "id", "value": ""}
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Updated Series\",\n  \"description\": \"Updated description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					}
+				},
+				{
+					"name": "Delete Series",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{base_url}}/api/series/:id?userId={{userId}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "series", ":id"],
+							"query": [
+								{"key": "userId", "value": "{{userId}}"}
+							],
+							"variable": [
+								{"key": "id", "value": ""}
+							]
+						}
+					}
+				},
+				{
+					"name": "Add Post to Series",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/api/series/:seriesId/posts/:postId?order=1&userId={{userId}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "series", ":seriesId", "posts", ":postId"],
+							"query": [
+								{"key": "order", "value": "1"},
+								{"key": "userId", "value": "{{userId}}"}
+							],
+							"variable": [
+								{"key": "seriesId", "value": ""},
+								{"key": "postId", "value": ""}
+							]
+						}
+					}
+				},
+				{
+					"name": "Remove Post from Series",
+					"request": {
+						"method": "DELETE",
+						"url": {
+							"raw": "{{base_url}}/api/series/:seriesId/posts/:postId?userId={{userId}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "series", ":seriesId", "posts", ":postId"],
+							"query": [
+								{"key": "userId", "value": "{{userId}}"}
+							],
+							"variable": [
+								{"key": "seriesId", "value": ""},
+								{"key": "postId", "value": ""}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Recommendations",
+			"item": [
+				{
+					"name": "Get Recommended Posts for User",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{base_url}}/api/v1/recommendations/users/:userId?page=0&size=10&currentUserId={{currentUserId}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "recommendations", "users", ":userId"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"},
+								{"key": "currentUserId", "value": "{{currentUserId}}"}
+							],
+							"variable": [
+								{"key": "userId", "value": ""}
+							]
+						}
+					}
+				},
+				{
+					"name": "Import Recommendations",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{base_url}}/api/v1/recommendations/import",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "recommendations", "import"]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "userId",
+			"value": "your-user-id"
+		},
+		{
+			"key": "currentUserId",
+			"value": "your-current-user-id"
+		}
+	]
+} 

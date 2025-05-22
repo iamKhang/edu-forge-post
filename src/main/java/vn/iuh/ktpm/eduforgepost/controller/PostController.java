@@ -29,7 +29,7 @@ import vn.iuh.ktpm.eduforgepost.model.Post;
 import vn.iuh.ktpm.eduforgepost.service.PostService;
 
 @RestController
-@RequestMapping("/api/posts")
+@RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
 public class PostController {
 

@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/series")
+@RequestMapping("/api/v1/series")
 @RequiredArgsConstructor
 public class SeriesController {
     
