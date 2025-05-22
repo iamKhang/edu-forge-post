@@ -8,14 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import com.mongodb.MongoClientSettings;
-import com.mongodb.ServerAddress;
-import java.util.Arrays;
 
 /**
  * MongoDB configuration class.
@@ -31,7 +26,7 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
     private String host;
 
     @Value("${spring.data.mongodb.port:27017}")
-    private String port;
+    private int port;
 
     @Value("${spring.data.mongodb.database:eduforge_post}")
     private String database;
@@ -51,15 +46,9 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
             return MongoClients.create(uri);
         }
 
-        // Create MongoDB client settings with CORS configuration
-        MongoClientSettings settings = MongoClientSettings.builder()
-                .applyToClusterSettings(builder -> 
-                    builder.hosts(Arrays.asList(new ServerAddress(host, Integer.parseInt(port))))
-                )
-                .build();
-
+        String connectionString = String.format("mongodb://%s:%d/%s", host, port, database);
         logger.info("Connecting to MongoDB at {}:{} with database {}", host, port, database);
-        return MongoClients.create(settings);
+        return MongoClients.create(connectionString);
     }
 
     @Override
@@ -70,20 +59,5 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
     @Bean
     public MongoTemplate mongoTemplate() throws Exception {
         return new MongoTemplate(mongoClient(), getDatabaseName());
-    }
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**")
-                        .allowedOriginPatterns("*")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD")
-                        .allowedHeaders("*")
-                        .allowCredentials(true)
-                        .maxAge(3600);
-            }
-        };
     }
 }

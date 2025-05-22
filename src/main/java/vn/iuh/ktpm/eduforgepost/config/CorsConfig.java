@@ -20,6 +20,7 @@ public class CorsConfig {
                         .allowedOriginPatterns("*")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD")
                         .allowedHeaders("*")
+                        .exposedHeaders("Authorization")
                         .allowCredentials(true)
                         .maxAge(3600);
             }
@@ -39,6 +40,9 @@ public class CorsConfig {
         
         // Allow all headers
         config.addAllowedHeader("*");
+        
+        // Expose the Authorization header
+        config.addExposedHeader("Authorization");
         
         // Allow credentials
         config.setAllowCredentials(true);
