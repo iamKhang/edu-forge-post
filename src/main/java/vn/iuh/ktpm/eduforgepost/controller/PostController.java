@@ -19,12 +19,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import vn.iuh.ktpm.eduforgepost.dto.ApiResponse;
 import vn.iuh.ktpm.eduforgepost.dto.PostRequest;
 import vn.iuh.ktpm.eduforgepost.dto.PostResponse;
+import vn.iuh.ktpm.eduforgepost.dto.AuthorResponse;
 import vn.iuh.ktpm.eduforgepost.model.Post;
 import vn.iuh.ktpm.eduforgepost.service.PostService;
 
@@ -248,5 +252,28 @@ public class PostController {
     public ResponseEntity<Map<String, Object>> getTrainingDataStatistics() {
         Map<String, Object> statistics = postService.getTrainingDataStatistics();
         return ResponseEntity.ok(statistics);
+    }
+
+    @GetMapping("/author/{id}")
+    public ResponseEntity<ApiResponse<AuthorResponse>> getAuthorInfo(@PathVariable String id) {
+        String url = "http://eduforge.io.vn:3001/dashboard/internal/user/" + id;
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("x-api-key", "sk_course_service_12345");
+        headers.set("x-service-name", "courseService");
+        
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<Map> response = restTemplate.exchange(url, org.springframework.http.HttpMethod.GET, entity, Map.class);
+        
+        Map<String, Object> userData = response.getBody();
+        
+        AuthorResponse authorResponse = AuthorResponse.builder()
+            .name((String) userData.get("name"))
+            .image((String) userData.get("image"))
+            .build();
+            
+        return ResponseEntity.ok(ApiResponse.success(authorResponse));
     }
 }
